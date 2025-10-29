@@ -5,7 +5,7 @@ using Domain.Entities;
 namespace Application.Services.Auth;
 
 public class AuthService(
-    IUserService userService,
+    IAuthUserService userService,
     JwtTokenService jwtTokenService,
     RefreshTokenService refreshTokenService
 )

@@ -39,7 +39,7 @@ if (jwtConfig is null || refreshTokenConfig is null)
 builder.Services.AddTransient<JwtTokenService>();
 builder.Services.AddTransient<RefreshTokenService>();
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthUserService, AuthUserService>();
 
 builder.Services.AddDbContext<UniversityDbContext>(options =>
     options.UseNpgsql(dbConnectionString)
@@ -47,6 +47,7 @@ builder.Services.AddDbContext<UniversityDbContext>(options =>
 builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<MappingProfile>(); });
 
 builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TeacherService>();
 builder.Services.AddScoped<AdministratorService>();
 builder.Services.AddScoped<CourseService>();

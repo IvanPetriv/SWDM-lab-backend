@@ -1,4 +1,5 @@
 using Api.Dtos;
+using Api.Extensions;
 using Application.Services;
 using AutoMapper;
 using Domain.Entities;
@@ -22,7 +23,29 @@ public class CourseController(
     [HttpGet("my")]
     public async Task<ActionResult<IEnumerable<CourseGetDto>>> GetMyCourses(CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var userId = this.GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var userRole = this.GetCurrentUserRole();
+
+        ICollection<Course> courses;
+
+        if (userRole == "Teacher")
+        {
+            courses = await service.GetAllOfTeacher(userId.Value, ct);
+        }
+        else if (userRole == "Student")
+        {
+            courses = await service.GetAllOfStudent(userId.Value, ct);
+        }
+        else
+        {
+            courses = await service.GetAll(ct);
+        }
+
+        var result = mapper.Map<IEnumerable<CourseGetDto>>(courses);
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
@@ -42,7 +65,13 @@ public class CourseController(
     [HttpGet("{id}/files")]
     public async Task<ActionResult<CourseWithFilesDto>> GetWithFiles(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var course = await service.GetByIdWithFiles(id, ct);
+
+        if (course is null)
+            return NotFound();
+
+        var courseDto = mapper.Map<CourseWithFilesDto>(course);
+        return Ok(courseDto);
     }
 
     [HttpGet]

@@ -3,22 +3,26 @@ using Domain.Entities;
 using System.Collections.Generic;
 
 namespace EFCore;
-public static class FakeDataGenerator {
+
+public static class FakeDataGenerator
+{
     // Generate Teachers first
-    public static List<Teacher> GenerateTeachers(int count) {
+    public static List<Teacher> GenerateTeachers(int count)
+    {
         var faker = new Faker<Teacher>()
             .RuleFor(t => t.Id, f => Guid.NewGuid())
             .RuleFor(t => t.Username, f => f.Internet.UserName())
             .RuleFor(t => t.FirstName, f => f.Name.FirstName())
             .RuleFor(t => t.LastName, f => f.Name.LastName())
-            .RuleFor(t => t.PasswordHash, f => f.Internet.Password())
+            .RuleFor(t => t.PasswordHash, f => BCrypt.Net.BCrypt.HashPassword("pass"))
             .RuleFor(t => t.Email, f => f.Internet.Email());
 
         return faker.Generate(count);
     }
 
     // Generate Courses referencing real Teachers
-    public static List<Course> GenerateCourses(List<Teacher> teachers, int count) {
+    public static List<Course> GenerateCourses(List<Teacher> teachers, int count)
+    {
         var faker = new Faker<Course>()
             .RuleFor(c => c.Id, f => Guid.NewGuid())
             .RuleFor(c => c.TeacherId, f => f.PickRandom(teachers).Id)
@@ -30,20 +34,22 @@ public static class FakeDataGenerator {
     }
 
     // Generate Students
-    public static List<Student> GenerateStudents(int count) {
+    public static List<Student> GenerateStudents(int count)
+    {
         var faker = new Faker<Student>()
             .RuleFor(s => s.Id, f => Guid.NewGuid())
             .RuleFor(s => s.Username, f => f.Internet.UserName())
             .RuleFor(s => s.FirstName, f => f.Name.FirstName())
             .RuleFor(s => s.LastName, f => f.Name.LastName())
-            .RuleFor(s => s.PasswordHash, f => f.Internet.Password())
+            .RuleFor(s => s.PasswordHash, f => BCrypt.Net.BCrypt.HashPassword("pass"))
             .RuleFor(s => s.Email, f => f.Internet.Email());
 
         return faker.Generate(count);
     }
 
     // Generate Enrollments referencing real Students and Courses
-    public static List<Enrollment> GenerateEnrollments(List<Student> students, List<Course> courses, int count) {
+    public static List<Enrollment> GenerateEnrollments(List<Student> students, List<Course> courses, int count)
+    {
         var enrollments = new List<Enrollment>();
         var existingKeys = new HashSet<(Guid, Guid)>();
 
@@ -52,12 +58,14 @@ public static class FakeDataGenerator {
             .RuleFor(e => e.Grade, f => f.Random.Int(0, 100));
 
         int attempts = 0;
-        while (enrollments.Count < count && attempts < count * 10) {
+        while (enrollments.Count < count && attempts < count * 10)
+        {
             attempts++;
             var studentId = students[Random.Shared.Next(students.Count)].Id;
             var courseId = courses[Random.Shared.Next(courses.Count)].Id;
 
-            if (existingKeys.Add((studentId, courseId))) {
+            if (existingKeys.Add((studentId, courseId)))
+            {
                 var e = faker.Generate();
                 e.StudentId = studentId;
                 e.CourseId = courseId;
@@ -70,7 +78,8 @@ public static class FakeDataGenerator {
 
 
     // Generate TextMaterials linked to Courses
-    public static List<TextMaterial> GenerateTextMaterials(List<Course> courses, int count) {
+    public static List<TextMaterial> GenerateTextMaterials(List<Course> courses, int count)
+    {
         var faker = new Faker<TextMaterial>()
             .RuleFor(tm => tm.Id, f => Guid.NewGuid())
             .RuleFor(tm => tm.CourseId, f => f.PickRandom(courses).Id)
@@ -81,7 +90,8 @@ public static class FakeDataGenerator {
     }
 
     // Generate MediaMaterials linked to Courses
-    public static List<MediaMaterial> GenerateMediaMaterials(List<Course> courses, int count) {
+    public static List<MediaMaterial> GenerateMediaMaterials(List<Course> courses, int count)
+    {
         var faker = new Faker<MediaMaterial>()
             .RuleFor(mm => mm.Id, f => Guid.NewGuid())
             .RuleFor(mm => mm.CourseId, f => f.PickRandom(courses).Id)

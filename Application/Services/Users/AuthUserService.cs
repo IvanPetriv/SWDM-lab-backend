@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Users;
 
-public class UserService(UniversityDbContext dbContext) : IUserService
+public class AuthUserService(UniversityDbContext dbContext) : IAuthUserService
 {
     public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
     {
