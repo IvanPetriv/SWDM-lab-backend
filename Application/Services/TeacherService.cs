@@ -16,14 +16,14 @@ public class TeacherService(UniversityDbContext dbContext) {
             .Where(c => c.TeacherId == teacherId)
             .ToListAsync(ct);
 
-    public async Task<Teacher> CreateTeacher(Teacher obj, CancellationToken ct) {
+    public async Task<Teacher> Create(Teacher obj, CancellationToken ct) {
         await dbContext.Teachers.AddAsync(obj, ct);
         await dbContext.SaveChangesAsync(ct);
         return obj;
     }
 
-    public async Task<Teacher?> Update(Teacher updated, CancellationToken ct) {
-        Teacher? existing = await dbContext.Teachers.FindAsync([updated.Id], ct);
+    public async Task<Teacher?> Update(Guid id, Teacher updated, CancellationToken ct) {
+        Teacher? existing = await dbContext.Teachers.FindAsync([id], ct);
         if (existing is null)
             return null;
 

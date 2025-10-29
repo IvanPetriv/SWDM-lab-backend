@@ -65,8 +65,9 @@ public class CourseService(UniversityDbContext dbContext) {
     /// <param name="updated"></param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>Updated <see cref="Course"/> object.</returns>
-    public async Task<Course?> Update(Course updated, CancellationToken ct) {
-        Course? existing = await dbContext.Courses.FindAsync([updated.Id], ct);
+    public async Task<Course?> Update(Guid id, Course updated, CancellationToken ct) {
+        Course? existing = await dbContext.Courses
+            .SingleOrDefaultAsync(e => e.Id == id, ct);
         if (existing is null)
             return null;
 
@@ -83,7 +84,8 @@ public class CourseService(UniversityDbContext dbContext) {
     /// <param name="ct">Cancellation token.</param>
     /// <returns>true if the deletion was successful, false otherwise.</returns>
     public async Task<bool> Delete(Guid id, CancellationToken ct) {
-        Course? course = await dbContext.Courses.FindAsync([id], ct);
+        Course? course = await dbContext.Courses
+            .SingleOrDefaultAsync(e => e.Id == id, ct);
         if (course is null)
             return false;
 
@@ -138,6 +140,4 @@ public class CourseService(UniversityDbContext dbContext) {
         await dbContext.SaveChangesAsync(ct);
         return true;
     }
-
-    
 }

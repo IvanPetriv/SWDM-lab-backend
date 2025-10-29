@@ -28,8 +28,8 @@ public class StudentService(UniversityDbContext dbContext) {
         return obj;
     }
 
-    public async Task<Student?> Update(Student updated, CancellationToken ct) {
-        Student? existing = await dbContext.Students.FindAsync([updated.Id], ct);
+    public async Task<Student?> Update(Guid id, Student updated, CancellationToken ct) {
+        Student? existing = await dbContext.Students.FindAsync([id], ct);
         if (existing is null)
             return null;
 

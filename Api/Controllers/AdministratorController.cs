@@ -31,13 +31,13 @@ public class AdministratorController(
     /// <returns>An <see cref="ActionResult{T}"/> containing a <see cref="StudentGetDto"/> if the student is found; otherwise, a
     /// NotFound result.</returns>
     [HttpGet("{id}")]
-    public async Task<ActionResult<StudentGetDto>> Get(Guid id, CancellationToken ct) {
-        Student? student = await service.GetById(id, ct);
+    public async Task<ActionResult<AdministratorGetDto>> Get(Guid id, CancellationToken ct) {
+        var student = await service.GetById(id, ct);
         if (student is null) {
             return NotFound();
         }
 
-        StudentGetDto studentDto = mapper.Map<StudentGetDto>(student);
+        var studentDto = mapper.Map<AdministratorGetDto>(student);
 
         return Ok(studentDto);
     }
@@ -51,14 +51,9 @@ public class AdministratorController(
     /// <returns>An <see cref="ActionResult{T}"/> containing the created student data transfer object if successful; otherwise, a
     /// conflict result if a student with the given ID already exists.</returns>
     [HttpPost]
-    public async Task<ActionResult<StudentGetDto>> Create(StudentGetDto objDto, CancellationToken ct) {
-        Student? existingStudent = await service.GetById(objDto.Id, ct);
-        if (existingStudent is not null) {
-            return Conflict("Student with the given ID already exists.");
-        }
-
-        Student obj = mapper.Map<Student>(objDto);
-        Student createdStudent = await service.CreateStudent(obj, ct);
+    public async Task<ActionResult<AdministratorGetDto>> Create(AdministratorGetDto objDto, CancellationToken ct) {
+        var obj = mapper.Map<Administrator>(objDto);
+        var createdStudent = await service.Create(obj, ct);
 
         return Ok(createdStudent);
     }

@@ -56,9 +56,6 @@ public class StudentController(
     [HttpPost]
     public async Task<ActionResult<StudentGetDto>> Create(StudentGetDto objDto, CancellationToken ct)
     {
-        var existingStudent = await service.GetById(objDto.Id, ct);
-        if (existingStudent is not null) return Conflict("Student with the given ID already exists.");
-
         var obj = mapper.Map<Student>(objDto);
         var createdStudent = await service.CreateStudent(obj, ct);
 

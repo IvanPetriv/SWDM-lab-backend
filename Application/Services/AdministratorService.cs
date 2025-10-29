@@ -11,14 +11,14 @@ public class AdministratorService(UniversityDbContext dbContext) {
     public async Task<ICollection<Administrator>> GetAll(CancellationToken ct) =>
         await dbContext.Administrators.ToListAsync(ct);
 
-    public async Task<Administrator> CreateAdministrator(Administrator obj, CancellationToken ct) {
+    public async Task<Administrator> Create(Administrator obj, CancellationToken ct) {
         await dbContext.Administrators.AddAsync(obj, ct);
         await dbContext.SaveChangesAsync(ct);
         return obj;
     }
 
-    public async Task<Administrator?> Update(Administrator updated, CancellationToken ct) {
-        Administrator? existing = await dbContext.Administrators.FindAsync([updated.Id], ct);
+    public async Task<Administrator?> Update(Guid id, Administrator updated, CancellationToken ct) {
+        Administrator? existing = await dbContext.Administrators.FindAsync([id], ct);
         if (existing is null)
             return null;
 
