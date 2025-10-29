@@ -1,6 +1,7 @@
 using Api.Mapping;
 using Api.Swagger;
 using Api.Utils;
+using Application.Services;
 using dotenv.net;
 using EFCore;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,10 @@ builder.Services.AddDbContext<UniversityDbContext>(options =>
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<MappingProfile>();
 });
+
+builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<AdministratorService>();
 
 
 builder.Services.AddControllers();

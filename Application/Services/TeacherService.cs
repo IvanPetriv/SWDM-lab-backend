@@ -1,3 +1,3 @@
 ﻿namespace Application.Services;
-public class CourseService {
+public class TeacherService {
 }

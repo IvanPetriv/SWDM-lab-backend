@@ -1,4 +1,5 @@
 using Api.Dtos;
+using Application.Services;
 using AutoMapper;
 using Domain.Entities;
 using EFCore;
@@ -18,13 +19,20 @@ namespace Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class StudentController(
-    UniversityDbContext dbContext,
+    StudentService service,
     IMapper mapper,
     ILogger<StudentController> logger
 ) : ControllerBase {
+    /// <summary>
+    /// Retrieves a student by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the student to retrieve.</param>
+    /// <param name="ct">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>An <see cref="ActionResult{T}"/> containing a <see cref="StudentGetDto"/> if the student is found; otherwise, a
+    /// NotFound result.</returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<StudentGetDto>> Get(Guid id, CancellationToken ct) {
-        var student = await dbContext.Students.SingleOrDefaultAsync(e => e.Id == id, ct);
+        var student = await service.GetStudent(id, ct);
         if (student is null) {
             return NotFound();
         }
@@ -34,16 +42,24 @@ public class StudentController(
         return Ok(studentDto);
     }
 
+
+    /// <summary>
+    /// Creates a new student record based on the provided data transfer object.
+    /// </summary>
+    /// <param name="objDto">The data transfer object containing the details of the student to be created.</param>
+    /// <param name="ct">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>An <see cref="ActionResult{T}"/> containing the created student data transfer object if successful; otherwise, a
+    /// conflict result if a student with the given ID already exists.</returns>
     [HttpPost]
     public async Task<ActionResult<StudentGetDto>> Create(StudentGetDto objDto, CancellationToken ct) {
-        if (dbContext.Students.Any(e => e.Id == objDto.Id)) {
+        Student? existingStudent = await service.GetStudent(objDto.Id, ct);
+        if (existingStudent is not null) {
             return Conflict("Student with the given ID already exists.");
         }
 
         var obj = mapper.Map<Student>(objDto);
-        var student = await dbContext.Students.AddAsync(obj, ct);
-        await dbContext.SaveChangesAsync(ct);
+        var createdStudent = await service.CreateStudent(obj, ct);
 
-        return Ok(student);
+        return Ok(createdStudent);
     }
 }
