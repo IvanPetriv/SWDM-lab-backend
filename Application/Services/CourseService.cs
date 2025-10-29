@@ -21,7 +21,7 @@ public class CourseService(UniversityDbContext dbContext) {
     public async Task<Course?> GetWithFilesAsync(Guid id, CancellationToken ct) {
         return await dbContext.Courses
             .Include(c => c.MediaMaterials)
-                .ThenInclude(m => m.File)
+                .ThenInclude(m => m.CourseFile)
             .Include(c => c.TextMaterials)
             .FirstOrDefaultAsync(c => c.Id == id, ct);
     }

@@ -55,7 +55,7 @@ public class CourseController(
 
         var dto = mapper.Map<CourseWithFilesDto>(course);
         dto.Files = course.MediaMaterials
-            .Select(m => mapper.Map<CourseFileDto>(m.File))
+            .Select(m => mapper.Map<CourseFileDto>(m.CourseFile))
             .ToList();
         return Ok(dto);
     }

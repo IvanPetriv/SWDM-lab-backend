@@ -27,6 +27,7 @@ public abstract class User
 
     // Navigations
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+    public ICollection<Enrollment> Enrollments { get; set; } = [];
 
 
     private static readonly Regex EmailRegex = new(@"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", RegexOptions.IgnoreCase | RegexOptions.Compiled);

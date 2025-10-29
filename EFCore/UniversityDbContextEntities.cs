@@ -19,7 +19,7 @@ public partial class UniversityDbContext : DbContext {
         modelBuilder.Entity<Enrollment>()
             .HasKey(e => new { e.UserId, e.CourseId });
         modelBuilder.Entity<Enrollment>()
-            .HasOne(e => e.Student)
+            .HasOne(e => e.User)
             .WithMany(s => s.Enrollments)
             .HasForeignKey(e => e.UserId);
         modelBuilder.Entity<Enrollment>()

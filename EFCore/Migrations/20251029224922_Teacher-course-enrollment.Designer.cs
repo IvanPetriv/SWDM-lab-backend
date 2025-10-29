@@ -3,6 +3,7 @@ using System;
 using EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EFCore.Migrations
 {
     [DbContext(typeof(UniversityDbContext))]
-    partial class UniversityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029224922_Teacher-course-enrollment")]
+    partial class Teachercourseenrollment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,7 +108,7 @@ namespace EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CourseFileId")
+                    b.Property<Guid>("CourseFile")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CourseId")
@@ -115,15 +118,18 @@ namespace EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseFileId");
-
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("FileId");
 
                     b.ToTable("MediaMaterials");
                 });
@@ -270,21 +276,21 @@ namespace EFCore.Migrations
 
             modelBuilder.Entity("Domain.Entities.MediaMaterial", b =>
                 {
-                    b.HasOne("Domain.Entities.CourseFile", "CourseFile")
-                        .WithMany()
-                        .HasForeignKey("CourseFileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Course", "Course")
                         .WithMany("MediaMaterials")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.CourseFile", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Course");
 
-                    b.Navigation("CourseFile");
+                    b.Navigation("File");
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>

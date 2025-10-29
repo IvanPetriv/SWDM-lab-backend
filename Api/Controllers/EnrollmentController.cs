@@ -33,6 +33,13 @@ public class EnrollmentController(
         return Ok(dtos);
     }
 
+    [HttpGet("user/{userId}/courses")]
+    public async Task<ActionResult<IEnumerable<StudentGetDto>>> GetUserCourses(Guid userId, CancellationToken ct) {
+        var students = await service.GetCourseStudentsAsync(userId, ct);
+        var dtos = mapper.Map<IEnumerable<StudentGetDto>>(students);
+        return Ok(dtos);
+    }
+
     [HttpPost("teacher")]
     [Authorize(Roles = "Administrator")]
     public async Task<ActionResult> AddTeacherToCourse([FromBody] AddTeacherToCourseDto dto, CancellationToken ct)

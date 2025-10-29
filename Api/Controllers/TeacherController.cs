@@ -1,5 +1,6 @@
 using Api.Dtos;
 using Application.Services;
+using Application.Services.Users;
 using AutoMapper;
 using Domain.Entities;
 using EFCore;
@@ -19,7 +20,7 @@ namespace Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class TeacherController(
-    TeacherService service,
+    UserService service,
     IMapper mapper,
     ILogger<TeacherController> logger
 ) : ControllerBase {
@@ -32,7 +33,7 @@ public class TeacherController(
     /// NotFound result.</returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<TeacherGetDto>> Get(Guid id, CancellationToken ct) {
-        Teacher? student = await service.GetById(id, ct);
+        Teacher? student = await service.GetAsync(id, ct) as Teacher;
         if (student is null) {
             return NotFound();
         }
@@ -53,7 +54,7 @@ public class TeacherController(
     [HttpPost]
     public async Task<ActionResult<TeacherGetDto>> Create(StudentGetDto objDto, CancellationToken ct) {
         Teacher obj = mapper.Map<Teacher>(objDto);
-        Teacher createdStudent = await service.Create(obj, ct);
+        Teacher? createdStudent = await service.CreateAsync(obj, ct) as Teacher;
 
         return Ok(createdStudent);
     }

@@ -1,10 +1,14 @@
-﻿using EFCore;
+﻿using Domain.Entities;
+using EFCore;
+using System.Collections.Generic;
+using System.Linq;
 
 var teachers = FakeDataGenerator.GenerateTeachers(5);
 var courses = FakeDataGenerator.GenerateCourses(teachers, 10);
 var courseFiles = FakeDataGenerator.GenerateCourseFiles(30);
 var students = FakeDataGenerator.GenerateStudents(50);
-var enrollments = FakeDataGenerator.GenerateEnrollments(students, courses, 100);
+var allPeople = students.Concat<User>(teachers).ToList();
+var enrollments = FakeDataGenerator.GenerateEnrollments(allPeople, courses, 100);
 var textMaterials = FakeDataGenerator.GenerateTextMaterials(courses, 30);
 var mediaMaterials = FakeDataGenerator.GenerateMediaMaterials(courses, courseFiles, 50);
 

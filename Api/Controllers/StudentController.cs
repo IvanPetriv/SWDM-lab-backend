@@ -1,5 +1,6 @@
 using Api.Dtos;
 using Application.Services;
+using Application.Services.Users;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace Api.Controllers;
 [Route("[controller]")]
 [Authorize]
 public class StudentController(
-    StudentService service,
+    UserService service,
     IMapper mapper,
     ILogger<StudentController> logger
 ) : ControllerBase
@@ -35,7 +36,7 @@ public class StudentController(
     [HttpGet("{id}")]
     public async Task<ActionResult<StudentGetDto>> Get(Guid id, CancellationToken ct)
     {
-        var student = await service.GetById(id, ct);
+        var student = await service.GetAsync(id, ct);
         if (student is null) return NotFound();
 
         var studentDto = mapper.Map<StudentGetDto>(student);
@@ -57,7 +58,7 @@ public class StudentController(
     public async Task<ActionResult<StudentGetDto>> Create(StudentGetDto objDto, CancellationToken ct)
     {
         var obj = mapper.Map<Student>(objDto);
-        var createdStudent = await service.CreateStudent(obj, ct);
+        var createdStudent = await service.CreateAsync(obj, ct);
 
         return Ok(createdStudent);
     }

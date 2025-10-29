@@ -42,7 +42,7 @@ public static class FakeDataGenerator {
     }
 
     // Generate Enrollments referencing real Students and Courses
-    public static List<Enrollment> GenerateEnrollments(List<Student> students, List<Course> courses, int count) {
+    public static List<Enrollment> GenerateEnrollments(List<User> students, List<Course> courses, int count) {
         var enrollments = new List<Enrollment>();
         var existingKeys = new HashSet<(Guid, Guid)>();
 
@@ -99,7 +99,7 @@ public static class FakeDataGenerator {
             .RuleFor(mm => mm.Title, f => f.Lorem.Sentence(3, 5))
             .RuleFor(mm => mm.Description, f => f.Lorem.Paragraph())
             .RuleFor(mm => mm.CourseId, f => f.PickRandom(courses).Id)
-            .RuleFor(mm => mm.CourseFile, f => f.PickRandom(courseFiles).Id);
+            .RuleFor(mm => mm.CourseFileId, f => f.PickRandom(courseFiles).Id);
 
         return faker.Generate(count);
     }

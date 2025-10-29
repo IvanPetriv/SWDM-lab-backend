@@ -5,6 +5,6 @@ public class Enrollment {
     public DateTime EnrolledAt { get; set; }
     public int Grade { get; set; }
 
-    public Student Student { get; set; } = null!;
+    public User User { get; set; } = null!;
     public Course Course { get; set; } = null!;
 }
