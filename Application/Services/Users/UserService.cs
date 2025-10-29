@@ -121,5 +121,4 @@ public class UserService(UniversityDbContext dbContext) : IUserService
         await dbContext.SaveChangesAsync(ct);
         return true;
     }
-
 }

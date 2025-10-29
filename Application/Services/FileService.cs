@@ -7,13 +7,15 @@ public class FileService(UniversityDbContext dbContext) {
     public async Task<CourseFile> UploadFileAsync(
         byte[] fileContent,
         string fileName,
-        string fileType,
-        long fileSize,
         Guid courseId,
         CancellationToken ct
         ) {
         if (fileContent == null || fileContent.Length == 0) {
             throw new ArgumentException("File is empty", nameof(fileContent));
+        }
+        var course = await dbContext.Courses.FindAsync([courseId], ct);
+        if (course is null) {
+            throw new KeyNotFoundException("Course not found");
         }
 
         var courseFile = new CourseFile {

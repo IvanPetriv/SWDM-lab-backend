@@ -25,7 +25,7 @@ public class FileController(
             content = ms.ToArray();
         }
         var uploadedFile = await service.UploadFileAsync(
-            content, file.FileName, Path.GetExtension(file.FileName)?.TrimStart('.') ?? "", file.Length, courseId, ct);
+            content, file.FileName, courseId, ct);
 
 
         var dto = new CourseFileDto {
