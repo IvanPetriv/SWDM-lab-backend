@@ -32,12 +32,12 @@ public class StudentController(
     /// NotFound result.</returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<StudentGetDto>> Get(Guid id, CancellationToken ct) {
-        var student = await service.GetStudent(id, ct);
+        Student? student = await service.GetStudent(id, ct);
         if (student is null) {
             return NotFound();
         }
 
-        var studentDto = mapper.Map<StudentGetDto>(student);
+        StudentGetDto studentDto = mapper.Map<StudentGetDto>(student);
 
         return Ok(studentDto);
     }
@@ -57,8 +57,8 @@ public class StudentController(
             return Conflict("Student with the given ID already exists.");
         }
 
-        var obj = mapper.Map<Student>(objDto);
-        var createdStudent = await service.CreateStudent(obj, ct);
+        Student obj = mapper.Map<Student>(objDto);
+        Student createdStudent = await service.CreateStudent(obj, ct);
 
         return Ok(createdStudent);
     }

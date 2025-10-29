@@ -9,6 +9,7 @@ public partial class UniversityDbContext : DbContext {
     public DbSet<Student> Students { get; set; } = null!;
     public DbSet<Teacher> Teachers { get; set; } = null!;
     public DbSet<Administrator> Administrators { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {

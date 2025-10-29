@@ -1,9 +1,9 @@
 ﻿using EFCore;
 
-var teachers = FakeDataGenerator.GenerateTeachers();
-var courses = FakeDataGenerator.GenerateCourses(teachers);
-var students = FakeDataGenerator.GenerateStudents();
-var enrollments = FakeDataGenerator.GenerateEnrollments(students, courses);
+List<Domain.Entities.Teacher> teachers = FakeDataGenerator.GenerateTeachers();
+List<Domain.Entities.Course> courses = FakeDataGenerator.GenerateCourses(teachers);
+List<Domain.Entities.Student> students = FakeDataGenerator.GenerateStudents();
+List<Domain.Entities.Enrollment> enrollments = FakeDataGenerator.GenerateEnrollments(students, courses);
 
 using UniversityDbContext context = new();
 context.Teachers.AddRange(teachers);

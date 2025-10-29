@@ -6,7 +6,7 @@ namespace EFCore;
 public static class FakeDataGenerator {
     // TODO: FIX
     public static List<Student> GenerateStudents(int count = 10) {
-        var studentFaker = new Faker<Student>()
+        Faker<Student> studentFaker = new Faker<Student>()
             .RuleFor(s => s.Id, _ => Guid.NewGuid())
             .RuleFor(s => s.Username, f => f.Internet.UserName())
             .RuleFor(s => s.PasswordHash, f => f.Internet.Password())
@@ -17,7 +17,7 @@ public static class FakeDataGenerator {
     }
 
     public static List<Teacher> GenerateTeachers(int count = 5) {
-        var teacherFaker = new Faker<Teacher>()
+        Faker<Teacher> teacherFaker = new Faker<Teacher>()
             .RuleFor(t => t.Id, _ => Guid.NewGuid())
             .RuleFor(t => t.Username, f => f.Internet.UserName())
             .RuleFor(t => t.PasswordHash, f => f.Internet.Password())
@@ -28,7 +28,7 @@ public static class FakeDataGenerator {
     }
 
     public static List<Course> GenerateCourses(List<Teacher> teachers, int count = 10) {
-        var courseFaker = new Faker<Course>()
+        Faker<Course> courseFaker = new Faker<Course>()
             .RuleFor(c => c.Id, _ => Guid.NewGuid())
             .RuleFor(c => c.Name, f => f.Company.CompanyName())
             .RuleFor(c => c.Description, f => f.Lorem.Sentence(10))
@@ -39,7 +39,7 @@ public static class FakeDataGenerator {
 
 
     public static List<Enrollment> GenerateEnrollments(List<Student> students, List<Course> courses, int count = 20) {
-        var enrollmentFaker = new Faker<Enrollment>()
+        Faker<Enrollment> enrollmentFaker = new Faker<Enrollment>()
             .RuleFor(e => e.Student, f => f.PickRandom(students))
             .RuleFor(e => e.Course, f => f.PickRandom(courses))
             .RuleFor(e => e.EnrolledAt, f => f.Date.Past(1));
