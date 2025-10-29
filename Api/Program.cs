@@ -29,8 +29,9 @@ builder.Services.AddAutoMapper(cfg => {
 });
 
 builder.Services.AddScoped<StudentService>();
-builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<TeacherService>();
 builder.Services.AddScoped<AdministratorService>();
+builder.Services.AddScoped<CourseService>();
 
 
 builder.Services.AddControllers();

@@ -1,5 +1,5 @@
 ﻿namespace Api.Dtos;
-public class StudentGetDto {
+public class AdministratorGetDto {
     public Guid Id { get; set; }
     public string Username { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;

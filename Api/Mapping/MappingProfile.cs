@@ -10,6 +10,8 @@ namespace Api.Mapping;
 public class MappingProfile : Profile {
     public MappingProfile() {
         CreateMap<Student, StudentGetDto>().ReverseMap();
+        CreateMap<Teacher, TeacherGetDto>().ReverseMap();
+        CreateMap<Administrator, AdministratorGetDto>().ReverseMap();
         CreateMap<Enrollment, EnrollmentGetDto>().ReverseMap();
         CreateMap<Course, CourseGetDto>().ReverseMap();
     }
