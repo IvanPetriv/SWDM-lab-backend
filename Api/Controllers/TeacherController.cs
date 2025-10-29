@@ -18,10 +18,10 @@ namespace Api.Controllers;
 /// <param name="logger"></param>
 [ApiController]
 [Route("[controller]")]
-public class StudentController(
-    StudentService service,
+public class TeacherController(
+    TeacherService service,
     IMapper mapper,
-    ILogger<StudentController> logger
+    ILogger<TeacherController> logger
 ) : ControllerBase {
     /// <summary>
     /// Retrieves a student by their unique identifier.

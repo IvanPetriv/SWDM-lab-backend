@@ -18,10 +18,10 @@ namespace Api.Controllers;
 /// <param name="logger"></param>
 [ApiController]
 [Route("[controller]")]
-public class StudentController(
-    StudentService service,
+public class CourseController(
+    CourseService service,
     IMapper mapper,
-    ILogger<StudentController> logger
+    ILogger<CourseController> logger
 ) : ControllerBase {
     /// <summary>
     /// Retrieves a student by their unique identifier.
@@ -32,7 +32,7 @@ public class StudentController(
     /// NotFound result.</returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<StudentGetDto>> Get(Guid id, CancellationToken ct) {
-        Student? student = await service.GetById(id, ct);
+        Student? student = await service.GetStudent(id, ct);
         if (student is null) {
             return NotFound();
         }
@@ -52,7 +52,7 @@ public class StudentController(
     /// conflict result if a student with the given ID already exists.</returns>
     [HttpPost]
     public async Task<ActionResult<StudentGetDto>> Create(StudentGetDto objDto, CancellationToken ct) {
-        Student? existingStudent = await service.GetById(objDto.Id, ct);
+        Student? existingStudent = await service.GetStudent(objDto.Id, ct);
         if (existingStudent is not null) {
             return Conflict("Student with the given ID already exists.");
         }
