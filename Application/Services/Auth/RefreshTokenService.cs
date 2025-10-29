@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Application.Services;
+namespace Application.Services.Auth;
 public class RefreshTokenService(RefreshTokenConfiguration config, UniversityDbContext dbContext) {
     public static string HashToken(string token) {
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
