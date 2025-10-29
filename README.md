@@ -22,13 +22,12 @@ The project is structured according to **Clean Architecture** principles and div
   - Contains core entities and business rules.
 - **Application**
   - Implements application-specific business logic.
-  - References **Domain**.
+  - References **Domain**. For now also references **EFCore**.
 - **ApplicationTests**
   - xUnit project for testing **Application** logic.
   - References **Domain** and **Application**.
 - **EFCore**
   - Infrastructure layer handling database operations via Entity Framework Core.
-  - References **Domain** and **Application**.
 - **Api**
   - ASP.NET presentation layer exposing endpoints.
   - References **Domain**, **Application**, and **EFCore**.
