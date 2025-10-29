@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Domain.Entities;
-public class Student : User {
+public class Teacher : User {
     // Navigations
-    public ICollection<Enrollment> Enrollments { get; set; } = [];
+    public ICollection<Course> Courses { get; set; } = [];
 }

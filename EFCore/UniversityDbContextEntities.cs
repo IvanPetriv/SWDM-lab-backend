@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 namespace EFCore;
 public partial class UniversityDbContext : DbContext {
     #region DbSets
-    public DbSet<Student> Students { get; set; } = null!;
     public DbSet<Course> Courses { get; set; } = null!;
     public DbSet<Enrollment> Enrollments { get; set; } = null!;
+    public DbSet<Student> Students { get; set; } = null!;
+    public DbSet<Teacher> Teachers { get; set; } = null!;
+    public DbSet<Administrator> Administrators { get; set; } = null!;
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
