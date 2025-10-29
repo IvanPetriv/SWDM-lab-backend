@@ -16,12 +16,18 @@ public class MappingProfile : Profile
         CreateMap<Student, StudentGetDto>().ReverseMap();
         CreateMap<Student, UserGetDto>();
         CreateMap<Student, CurrentUserDto>();
+        CreateMap<Student, UserSearchDto>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => "Student"));
         CreateMap<Teacher, UserGetDto>();
         CreateMap<Teacher, CurrentUserDto>();
+        CreateMap<Teacher, UserSearchDto>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => "Teacher"));
         CreateMap<Teacher, TeacherGetDto>().ReverseMap();
         CreateMap<Administrator, AdministratorGetDto>().ReverseMap();
         CreateMap<Administrator, UserGetDto>();
         CreateMap<Administrator, CurrentUserDto>();
+        CreateMap<Administrator, UserSearchDto>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => "Administrator"));
         CreateMap<Enrollment, EnrollmentGetDto>().ReverseMap();
         CreateMap<Course, CourseGetDto>().ReverseMap();
 
