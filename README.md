@@ -1,5 +1,7 @@
 # University Project: Laboratory Work on XP Methodology
 
+**To generate fake data, make *EFCore* a startup project and start it. Otherwise, use *Api* project.**
+
 ## Description
 This project is a laboratory work designed to learn and apply **Extreme Programming (XP)** methodology. It demonstrates the implementation of a course management system following modern software architecture practices.
 
