@@ -3,6 +3,7 @@ using System;
 using EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EFCore.Migrations
 {
     [DbContext(typeof(UniversityDbContext))]
-    partial class UniversityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029202618_course-materials")]
+    partial class coursematerials
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,7 +112,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("MediaMaterials");
+                    b.ToTable("MediaMaterial");
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
@@ -165,7 +168,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("TextMaterials");
+                    b.ToTable("TextMaterial");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>

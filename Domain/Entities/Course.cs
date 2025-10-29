@@ -8,4 +8,6 @@ public class Course {
 
     // Navigations
     public virtual ICollection<Enrollment> Enrollments { get; set; } = [];
+    public virtual ICollection<TextMaterial> TextMaterials { get; set; } = [];
+    public virtual ICollection<MediaMaterial> MediaMaterials { get; set; } = [];
 }

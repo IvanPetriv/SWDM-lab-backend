@@ -1,49 +1,98 @@
 ﻿using Bogus;
 using Domain.Entities;
-
+using System.Collections.Generic;
 
 namespace EFCore;
 public static class FakeDataGenerator {
-    // TODO: FIX
-    public static List<Student> GenerateStudents(int count = 10) {
-        Faker<Student> studentFaker = new Faker<Student>()
-            .RuleFor(s => s.Id, _ => Guid.NewGuid())
-            .RuleFor(s => s.Username, f => f.Internet.UserName())
-            .RuleFor(s => s.PasswordHash, f => f.Internet.Password())
-            .RuleFor(s => s.Email, f => f.Internet.Email())
-            .RuleFor(s => s.Enrollments, _ => new List<Enrollment>());
-
-        return studentFaker.Generate(count);
-    }
-
-    public static List<Teacher> GenerateTeachers(int count = 5) {
-        Faker<Teacher> teacherFaker = new Faker<Teacher>()
-            .RuleFor(t => t.Id, _ => Guid.NewGuid())
+    // Generate Teachers first
+    public static List<Teacher> GenerateTeachers(int count) {
+        var faker = new Faker<Teacher>()
+            .RuleFor(t => t.Id, f => Guid.NewGuid())
             .RuleFor(t => t.Username, f => f.Internet.UserName())
+            .RuleFor(t => t.FirstName, f => f.Name.FirstName())
+            .RuleFor(t => t.LastName, f => f.Name.LastName())
             .RuleFor(t => t.PasswordHash, f => f.Internet.Password())
-            .RuleFor(t => t.Email, f => f.Internet.Email())
-            .RuleFor(t => t.Courses, _ => new List<Course>());
+            .RuleFor(t => t.Email, f => f.Internet.Email());
 
-        return teacherFaker.Generate(count);
+        return faker.Generate(count);
     }
 
-    public static List<Course> GenerateCourses(List<Teacher> teachers, int count = 10) {
-        Faker<Course> courseFaker = new Faker<Course>()
-            .RuleFor(c => c.Id, _ => Guid.NewGuid())
+    // Generate Courses referencing real Teachers
+    public static List<Course> GenerateCourses(List<Teacher> teachers, int count) {
+        var faker = new Faker<Course>()
+            .RuleFor(c => c.Id, f => Guid.NewGuid())
+            .RuleFor(c => c.TeacherId, f => f.PickRandom(teachers).Id)
             .RuleFor(c => c.Name, f => f.Company.CompanyName())
-            .RuleFor(c => c.Description, f => f.Lorem.Sentence(10))
-            .RuleFor(c => c.Enrollments, _ => new List<Enrollment>());
+            .RuleFor(c => c.Description, f => f.Lorem.Sentence())
+            .RuleFor(c => c.Code, f => f.Random.Int(1000, 9999));
 
-        return courseFaker.Generate(count);
+        return faker.Generate(count);
+    }
+
+    // Generate Students
+    public static List<Student> GenerateStudents(int count) {
+        var faker = new Faker<Student>()
+            .RuleFor(s => s.Id, f => Guid.NewGuid())
+            .RuleFor(s => s.Username, f => f.Internet.UserName())
+            .RuleFor(s => s.FirstName, f => f.Name.FirstName())
+            .RuleFor(s => s.LastName, f => f.Name.LastName())
+            .RuleFor(s => s.PasswordHash, f => f.Internet.Password())
+            .RuleFor(s => s.Email, f => f.Internet.Email());
+
+        return faker.Generate(count);
+    }
+
+    // Generate Enrollments referencing real Students and Courses
+    public static List<Enrollment> GenerateEnrollments(List<Student> students, List<Course> courses, int count) {
+        var enrollments = new List<Enrollment>();
+        var existingKeys = new HashSet<(Guid, Guid)>();
+
+        var faker = new Faker<Enrollment>()
+            .RuleFor(e => e.EnrolledAt, f => f.Date.Past(1).ToUniversalTime())
+            .RuleFor(e => e.Grade, f => f.Random.Int(0, 100));
+
+        int attempts = 0;
+        while (enrollments.Count < count && attempts < count * 10) {
+            attempts++;
+            var studentId = students[Random.Shared.Next(students.Count)].Id;
+            var courseId = courses[Random.Shared.Next(courses.Count)].Id;
+
+            if (existingKeys.Add((studentId, courseId))) {
+                var e = faker.Generate();
+                e.StudentId = studentId;
+                e.CourseId = courseId;
+                enrollments.Add(e);
+            }
+        }
+
+        return enrollments;
     }
 
 
-    public static List<Enrollment> GenerateEnrollments(List<Student> students, List<Course> courses, int count = 20) {
-        Faker<Enrollment> enrollmentFaker = new Faker<Enrollment>()
-            .RuleFor(e => e.Student, f => f.PickRandom(students))
-            .RuleFor(e => e.Course, f => f.PickRandom(courses))
-            .RuleFor(e => e.EnrolledAt, f => f.Date.Past(1));
+    // Generate TextMaterials linked to Courses
+    public static List<TextMaterial> GenerateTextMaterials(List<Course> courses, int count) {
+        var faker = new Faker<TextMaterial>()
+            .RuleFor(tm => tm.Id, f => Guid.NewGuid())
+            .RuleFor(tm => tm.CourseId, f => f.PickRandom(courses).Id)
+            .RuleFor(tm => tm.Title, f => f.Lorem.Sentence(3, 5))
+            .RuleFor(tm => tm.Description, f => f.Lorem.Paragraph());
 
-        return enrollmentFaker.Generate(count);
+        return faker.Generate(count);
+    }
+
+    // Generate MediaMaterials linked to Courses
+    public static List<MediaMaterial> GenerateMediaMaterials(List<Course> courses, int count) {
+        var faker = new Faker<MediaMaterial>()
+            .RuleFor(mm => mm.Id, f => Guid.NewGuid())
+            .RuleFor(mm => mm.CourseId, f => f.PickRandom(courses).Id)
+            .RuleFor(mm => mm.Title, f => f.Lorem.Sentence(3, 5))
+            .RuleFor(mm => mm.Description, f => f.Lorem.Paragraph())
+            .RuleFor(mm => mm.FileName, f => f.System.FileName())
+            .RuleFor(mm => mm.FileType, f => f.System.FileExt())
+            .RuleFor(mm => mm.FileSize, f => f.Random.Long(1024, 10_000_000))
+            .RuleFor(mm => mm.FileContent, f => f.Random.Bytes(256))
+            .RuleFor(mm => mm.CreatedAt, f => f.Date.Past(1).ToUniversalTime());
+
+        return faker.Generate(count);
     }
 }

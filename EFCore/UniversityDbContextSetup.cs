@@ -9,12 +9,15 @@ public partial class UniversityDbContext : DbContext {
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         if (!optionsBuilder.IsConfigured) {
-            DotEnv.Load();
-            string? dbConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
-                ?? throw new NullReferenceException("Environment does not have 'DATABASE_CONNECTION_STRING' variable");
-            optionsBuilder.UseNpgsql(dbConnectionString);
+            //DotEnv.Load();
+            //string? dbConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
+            //    ?? throw new NullReferenceException("Environment does not have 'DATABASE_CONNECTION_STRING' variable");
+            //optionsBuilder.UseNpgsql(dbConnectionString);
 
-            Console.WriteLine($"Connecting to database: {dbConnectionString}");
+            //Console.WriteLine($"Connecting to database: {dbConnectionString}");
+
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=University-lab;Username=postgres;Password=ivan");
+
         }
     }
 }
