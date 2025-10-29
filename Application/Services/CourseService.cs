@@ -98,19 +98,25 @@ public class CourseService(UniversityDbContext dbContext)
 
 
     /// <summary>
-    /// 
+    /// Updates an existing course with the provided values.
     /// </summary>
-    /// <param name="updated"></param>
+    /// <param name="id">The ID of the course to update.</param>
+    /// <param name="name">The new name for the course.</param>
+    /// <param name="description">The new description for the course.</param>
+    /// <param name="code">The new code for the course.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>Updated <see cref="Course"/> object.</returns>
-    public async Task<Course?> Update(Guid id, Course updated, CancellationToken ct)
+    public async Task<Course?> Update(Guid id, string name, string description, int code, CancellationToken ct)
     {
         Course? existing = await dbContext.Courses
             .SingleOrDefaultAsync(e => e.Id == id, ct);
         if (existing is null)
             return null;
 
-        dbContext.Entry(existing).CurrentValues.SetValues(updated);
+        existing.Name = name;
+        existing.Description = description;
+        existing.Code = code;
+
         await dbContext.SaveChangesAsync(ct);
         return existing;
     }
@@ -184,5 +190,22 @@ public class CourseService(UniversityDbContext dbContext)
         dbContext.Enrollments.Remove(enrollment);
         await dbContext.SaveChangesAsync(ct);
         return true;
+    }
+
+    /// <summary>
+    /// Checks if a teacher is the owner of a course.
+    /// </summary>
+    /// <param name="courseId">The course ID.</param>
+    /// <param name="teacherId">The teacher ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>True if the teacher owns the course, false otherwise.</returns>
+    public async Task<bool> IsTeacherOwner(Guid courseId, Guid teacherId, CancellationToken ct)
+    {
+        var course = await dbContext.Courses
+            .Where(c => c.Id == courseId)
+            .Select(c => c.TeacherId)
+            .FirstOrDefaultAsync(ct);
+
+        return course == teacherId;
     }
 }

@@ -17,6 +17,18 @@ public class UserController(
 ) : ControllerBase
 {
 
+    [HttpGet("{id}")]
+    [Authorize]
+    public async Task<ActionResult<UserSearchDto>> GetUserById(Guid id, CancellationToken ct)
+    {
+        var user = await service.GetById(id, ct);
+        if (user == null)
+            return NotFound();
+
+        var userDto = mapper.Map<UserSearchDto>(user);
+        return Ok(userDto);
+    }
+
     [HttpGet("me")]
     public async Task<ActionResult<CurrentUserDto>> GetCurrentUser(CancellationToken ct)
     {
@@ -73,7 +85,7 @@ public class UserController(
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrator")]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<UserSearchDto>>> GetAllUsers(CancellationToken ct)
     {
         var users = await service.GetAll(ct);
