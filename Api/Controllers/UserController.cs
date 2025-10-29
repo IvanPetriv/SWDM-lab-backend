@@ -35,14 +35,20 @@ public class UserController(
     }
 
     [HttpPut("me")]
-    public async Task<ActionResult> UpdateCurrentUser([FromBody] UserGetDto userDto, CancellationToken ct)
+    public async Task<ActionResult> UpdateCurrentUser([FromBody] UpdateUserDto userDto, CancellationToken ct)
     {
         var userId = this.GetCurrentUserId();
         if (userId == null)
             return Unauthorized();
 
-        var user = mapper.Map<User>(userDto);
-        var updated = await service.Update(userId.Value, user, ct);
+        var updated = await service.Update(
+            userId.Value,
+            userDto.Username,
+            userDto.FirstName,
+            userDto.LastName,
+            userDto.Email,
+            ct
+        );
 
         if (updated == null)
             return NotFound();

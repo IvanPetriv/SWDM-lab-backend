@@ -53,16 +53,16 @@ public class UserService(UniversityDbContext dbContext)
         return user;
     }
 
-    public async Task<User?> Update(Guid id, User updated, CancellationToken ct)
+    public async Task<User?> Update(Guid id, string username, string firstName, string lastName, string email, CancellationToken ct)
     {
         var user = await GetById(id, ct);
         if (user == null)
             return null;
 
-        user.Username = updated.Username;
-        user.FirstName = updated.FirstName;
-        user.LastName = updated.LastName;
-        user.Email = updated.Email;
+        user.Username = username;
+        user.FirstName = firstName;
+        user.LastName = lastName;
+        user.Email = email;
 
         await dbContext.SaveChangesAsync(ct);
         return user;
