@@ -38,18 +38,20 @@ if (jwtConfig is null || refreshTokenConfig is null)
 
 builder.Services.AddTransient<JwtTokenService>();
 builder.Services.AddTransient<RefreshTokenService>();
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddDbContext<UniversityDbContext>(options =>
     options.UseNpgsql(dbConnectionString)
 );
 builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<MappingProfile>(); });
 
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<FileService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<StudentService>();
 builder.Services.AddScoped<TeacherService>();
 builder.Services.AddScoped<AdministratorService>();
 builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<EnrollmentService>();
 
 
 builder.Services.AddControllers();

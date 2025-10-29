@@ -1,5 +1,5 @@
 ﻿namespace Domain.Entities;
 public class Teacher : User {
     // Navigations
-    public ICollection<Course> Courses { get; set; } = [];
+    public ICollection<Enrollment> Enrollments { get; set; } = [];
 }

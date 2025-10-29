@@ -10,11 +10,20 @@ public class CourseService(UniversityDbContext dbContext) {
     /// <param name="id">Course ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns><see cref="Course"/> object if found, null otherwise.</returns>
-    public async Task<Course?> GetById(Guid id, CancellationToken ct) {
+    public async Task<Course?> GetByIdAsync(Guid id, CancellationToken ct) {
         Course? course = await dbContext.Courses
             .SingleOrDefaultAsync(e => e.Id == id, ct);
 
         return course;
+    }
+
+
+    public async Task<Course?> GetWithFilesAsync(Guid id, CancellationToken ct) {
+        return await dbContext.Courses
+            .Include(c => c.MediaMaterials)
+                .ThenInclude(m => m.File)
+            .Include(c => c.TextMaterials)
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
 
@@ -23,7 +32,7 @@ public class CourseService(UniversityDbContext dbContext) {
     /// </summary>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A collection of all <see cref="Course"/> objects.</returns>
-    public async Task<ICollection<Course>> GetAll(CancellationToken ct) {
+    public async Task<ICollection<Course>> GetAllAsync(CancellationToken ct) {
         List<Course> courses = await dbContext.Courses
             .ToListAsync(ct);
 
@@ -31,18 +40,15 @@ public class CourseService(UniversityDbContext dbContext) {
     }
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="teacherId"></param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>A collection of teacher's <see cref="Course"/> objects.</returns>
-    public async Task<ICollection<Course>> GetAllOfTeacher(Guid teacherId, CancellationToken ct) {
-        List<Course> courses = await dbContext.Courses
-            .Where(e => e.TeacherId == teacherId)
+    public async Task<IEnumerable<Course>> GetByUserIdAsync(Guid userId, CancellationToken ct) {
+        // Assuming a many-to-many: Users <-> Courses
+        var enrollments = await dbContext.Enrollments
+            .Where(e => e.UserId == userId)
+            .Include(e => e.Course)
+            .Select(e => e.Course)
             .ToListAsync(ct);
 
-        return courses;
+        return enrollments;
     }
 
 
@@ -52,7 +58,7 @@ public class CourseService(UniversityDbContext dbContext) {
     /// <param name="obj"></param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>Created <see cref="Course"/> object.</returns>
-    public async Task<Course> Create(Course obj, CancellationToken ct) {
+    public async Task<Course> CreateAsync(Course obj, CancellationToken ct) {
         await dbContext.Courses.AddAsync(obj, ct);
         await dbContext.SaveChangesAsync(ct);
         return obj;
@@ -65,7 +71,7 @@ public class CourseService(UniversityDbContext dbContext) {
     /// <param name="updated"></param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>Updated <see cref="Course"/> object.</returns>
-    public async Task<Course?> Update(Guid id, Course updated, CancellationToken ct) {
+    public async Task<Course?> UpdateAsync(Guid id, Course updated, CancellationToken ct) {
         Course? existing = await dbContext.Courses
             .SingleOrDefaultAsync(e => e.Id == id, ct);
         if (existing is null)
@@ -83,60 +89,13 @@ public class CourseService(UniversityDbContext dbContext) {
     /// <param name="id"></param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>true if the deletion was successful, false otherwise.</returns>
-    public async Task<bool> Delete(Guid id, CancellationToken ct) {
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct) {
         Course? course = await dbContext.Courses
             .SingleOrDefaultAsync(e => e.Id == id, ct);
         if (course is null)
             return false;
 
         dbContext.Courses.Remove(course);
-        await dbContext.SaveChangesAsync(ct);
-        return true;
-    }
-
-
-    // --- Relational operations ---
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="studentId"></param>
-    /// <param name="courseId"></param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns></returns>
-    public async Task<Enrollment?> EnrollStudent(Guid studentId, Guid courseId, CancellationToken ct) {
-        if (!await dbContext.Students.AnyAsync(s => s.Id == studentId, ct)
-            || !await dbContext.Courses.AnyAsync(c => c.Id == courseId, ct)) {
-            return null;
-        }
-
-        Enrollment enrollment = new() {
-            StudentId = studentId,
-            CourseId = courseId,
-            EnrolledAt = DateTime.UtcNow
-        };
-
-        await dbContext.Enrollments.AddAsync(enrollment, ct);
-        await dbContext.SaveChangesAsync(ct);
-        return enrollment;
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="studentId"></param>
-    /// <param name="courseId"></param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns></returns>
-    public async Task<bool> UnenrollStudent(Guid studentId, Guid courseId, CancellationToken ct) {
-        Enrollment? enrollment = await dbContext.Enrollments
-            .SingleOrDefaultAsync(e => e.StudentId == studentId && e.CourseId == courseId, ct);
-
-        if (enrollment is null) {
-            return false;
-        }
-
-        dbContext.Enrollments.Remove(enrollment);
         await dbContext.SaveChangesAsync(ct);
         return true;
     }

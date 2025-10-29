@@ -11,16 +11,17 @@ public partial class UniversityDbContext : DbContext {
     public DbSet<Administrator> Administrators { get; set; } = null!;
     public DbSet<TextMaterial> TextMaterials { get; set; } = null!;
     public DbSet<MediaMaterial> MediaMaterials { get; set; } = null!;
+    public DbSet<CourseFile> CourseFiles { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         modelBuilder.Entity<Enrollment>()
-            .HasKey(e => new { e.StudentId, e.CourseId });
+            .HasKey(e => new { e.UserId, e.CourseId });
         modelBuilder.Entity<Enrollment>()
             .HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
-            .HasForeignKey(e => e.StudentId);
+            .HasForeignKey(e => e.UserId);
         modelBuilder.Entity<Enrollment>()
             .HasOne(e => e.Course)
             .WithMany(c => c.Enrollments)

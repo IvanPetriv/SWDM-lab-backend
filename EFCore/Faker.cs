@@ -21,7 +21,6 @@ public static class FakeDataGenerator {
     public static List<Course> GenerateCourses(List<Teacher> teachers, int count) {
         var faker = new Faker<Course>()
             .RuleFor(c => c.Id, f => Guid.NewGuid())
-            .RuleFor(c => c.TeacherId, f => f.PickRandom(teachers).Id)
             .RuleFor(c => c.Name, f => f.Company.CompanyName())
             .RuleFor(c => c.Description, f => f.Lorem.Sentence())
             .RuleFor(c => c.Code, f => f.Random.Int(1000, 9999));
@@ -59,7 +58,7 @@ public static class FakeDataGenerator {
 
             if (existingKeys.Add((studentId, courseId))) {
                 var e = faker.Generate();
-                e.StudentId = studentId;
+                e.UserId = studentId;
                 e.CourseId = courseId;
                 enrollments.Add(e);
             }
@@ -80,18 +79,27 @@ public static class FakeDataGenerator {
         return faker.Generate(count);
     }
 
-    // Generate MediaMaterials linked to Courses
-    public static List<MediaMaterial> GenerateMediaMaterials(List<Course> courses, int count) {
+    // Generate CourseFiles
+    public static List<CourseFile> GenerateCourseFiles(int count) {
+        var faker = new Faker<CourseFile>()
+            .RuleFor(cf => cf.Id, f => Guid.NewGuid())
+            .RuleFor(cf => cf.FileName, f => f.System.FileName())
+            .RuleFor(cf => cf.FileType, f => f.System.FileExt())
+            .RuleFor(cf => cf.FileSize, f => f.Random.Long(1024, 10_000_000))
+            .RuleFor(cf => cf.FileContent, f => f.Random.Bytes(256)) // dummy content
+            .RuleFor(cf => cf.CreatedAt, f => f.Date.Past(1).ToUniversalTime());
+
+        return faker.Generate(count);
+    }
+
+    // Generate MediaMaterials referencing existing Courses and CourseFiles
+    public static List<MediaMaterial> GenerateMediaMaterials(List<Course> courses, List<CourseFile> courseFiles, int count) {
         var faker = new Faker<MediaMaterial>()
             .RuleFor(mm => mm.Id, f => Guid.NewGuid())
-            .RuleFor(mm => mm.CourseId, f => f.PickRandom(courses).Id)
             .RuleFor(mm => mm.Title, f => f.Lorem.Sentence(3, 5))
             .RuleFor(mm => mm.Description, f => f.Lorem.Paragraph())
-            .RuleFor(mm => mm.FileName, f => f.System.FileName())
-            .RuleFor(mm => mm.FileType, f => f.System.FileExt())
-            .RuleFor(mm => mm.FileSize, f => f.Random.Long(1024, 10_000_000))
-            .RuleFor(mm => mm.FileContent, f => f.Random.Bytes(256))
-            .RuleFor(mm => mm.CreatedAt, f => f.Date.Past(1).ToUniversalTime());
+            .RuleFor(mm => mm.CourseId, f => f.PickRandom(courses).Id)
+            .RuleFor(mm => mm.CourseFile, f => f.PickRandom(courseFiles).Id);
 
         return faker.Generate(count);
     }
