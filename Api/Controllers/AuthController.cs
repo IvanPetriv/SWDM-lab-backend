@@ -1,74 +1,59 @@
-﻿//using AutoMapper;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Api.Dtos;
+using Application.Objects.Auth;
+using Application.Services.Auth;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace api.Controllers.Auth;
+namespace Api.Controllers;
 
-//// TODO: centralize length of refresh token in app settings
+[Route("[controller]")]
+[ApiController]
+public class AuthController(AuthService authService) : ControllerBase
+{
+    private const int RefreshTokenSeconds = 86400;
 
-//[AllowAnonymous]
-//[Route("api/v1/[controller]")]
-//[ApiController]
-//public class AuthController(AuthService authService, IMapper mapper) : ControllerBase {
-//    private const int RefreshTokenSeconds = 86400;
+    private void SetRefreshCookie(string refreshToken)
+    {
+        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddSeconds(RefreshTokenSeconds),
+        });
+    }
 
-//    /// <summary>
-//    /// Gets the refresh token from the HTTP cookies.
-//    /// </summary>
-//    /// <returns></returns>
-//    private string? GetRefreshCookie() {
-//        return Request.Cookies["refreshToken"];
-//    }
+    private string? GetRefreshCookie()
+    {
+        return Request.Cookies["refreshToken"];
+    }
 
-//    /// <summary>
-//    /// Sets the refresh token in the HTTP cookies.
-//    /// </summary>
-//    /// <param name="refreshToken">Refresh token to set.</param>
-//    private void SetRefreshCookie(string refreshToken) {
-//        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions {
-//            HttpOnly = true,
-//            Secure = true,
-//            SameSite = SameSiteMode.None,
-//            Expires = DateTimeOffset.UtcNow.AddSeconds(RefreshTokenSeconds)
-//        });
-//    }
+    [HttpPost("signup")]
+    public async Task<ActionResult<UserGetDto>> Signup([FromBody] ManualAuthUser dto, CancellationToken ct)
+    {
+        var result = await authService.SignupUserAsync(dto, ct);
+        return Ok(result);
+    }
 
-//    [HttpPost("signup")]
-//    public async Task<ActionResult<AccessTokenResult>> Signup([FromBody] ManualAuthUser dto, CancellationToken ct) {
-//        var result = await authService.SignupUserAsync(dto, ct);
-//        var response = mapper.Map<UserGetDto>(result);
-//        return Ok(response);
-//    }
+    [HttpPost("login")]
+    public async Task<ActionResult<AccessTokenResult>> Login([FromBody] LoginRequest dto, CancellationToken ct)
+    {
+        var result = await authService.LoginManuallyAsync(dto.Email, dto.Password, ct);
+        if (result is null) return Unauthorized();
 
+        SetRefreshCookie(result.RefreshToken);
+        return Ok(new AccessTokenResult(result.AccessToken));
+    }
 
-//    [HttpPost("login")]
-//    public async Task<ActionResult<AccessTokenResult>> Login([FromBody] LoginRequest dto, CancellationToken ct) {
-//        var result = await authService.LoginManuallyAsync(dto.Login, dto.Password, ct);
-//        if (result is null) {
-//            return NotFound();
-//        }
+    [HttpGet("refresh")]
+    public async Task<ActionResult<AccessTokenResult>> Refresh(CancellationToken ct)
+    {
+        var refreshToken = GetRefreshCookie();
+        var result = await authService.RefreshTokenAsync(refreshToken, ct);
+        if (result is null) return Unauthorized();
 
-//        SetRefreshCookie(result.RefreshToken);
+        SetRefreshCookie(result.RefreshToken);
+        return Ok(new AccessTokenResult(result.AccessToken));
+    }
+}
 
-//        return Ok(new AccessTokenResult(result.AccessToken));
-//    }
-
-
-//    [HttpGet("refresh")]
-//    public async Task<ActionResult<AccessTokenResult>> Refresh(CancellationToken ct) {
-//        string? refreshToken = GetRefreshCookie();
-//        if (string.IsNullOrEmpty(refreshToken)) {
-//            return Unauthorized();
-//        }
-
-//        // Refreshes the token in application service and returns a new one
-//        var result = await authService.RefreshTokenAsync(refreshToken, ct);
-//        if (result is null) {
-//            return Unauthorized();
-//        }
-
-//        SetRefreshCookie(result.RefreshToken);
-
-//        return Ok(new AccessTokenResult(result.AccessToken));
-//    }
-//}
+public record LoginRequest(string Email, string Password);

@@ -3,8 +3,11 @@ using Api.Mapping;
 using Api.OpenApi;
 using Api.Swagger;
 using Api.Utils;
+using Application.Configurations;
 using Application.Objects.Configurations;
 using Application.Services;
+using Application.Services.Auth;
+using Application.Services.Users;
 using dotenv.net;
 using EFCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,24 +23,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 DotEnv.Load();
 var dbConnectionString = EnvVarUtils.TryGetEnvVar("DATABASE_CONNECTION_STRING");
-var jwtKey = EnvVarUtils.TryGetEnvVar("JWT_KEY");
 
 #endregion
 
-
-#region appsettings.json vars
 
 var jwtConfig = builder.Configuration.GetSection("JwtSettings").Get<JwtConfiguration>();
 var refreshTokenConfig = builder.Configuration.GetSection("RefreshTokenSettings").Get<RefreshTokenConfiguration>();
+
 if (jwtConfig is null || refreshTokenConfig is null)
     throw new InvalidOperationException("Missing required environment variables.");
 
-jwtConfig = jwtConfig with { Key = jwtKey };
-
-#endregion
-
 
 #region AddServices
+
+builder.Services.AddTransient<JwtTokenService>();
+builder.Services.AddTransient<RefreshTokenService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddDbContext<UniversityDbContext>(options =>
     options.UseNpgsql(dbConnectionString)
@@ -69,15 +71,17 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtConfig.Issuer,
             ValidAudience = jwtConfig.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+            ClockSkew = TimeSpan.Zero
         };
     });
 
 
 builder.Services.AddCors(options =>
 {
+    var frontendUrl = builder.Configuration.GetValue<string>("Frontend:Url") ?? "http://localhost:5173";
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins(builder.Configuration.GetValue<string>("Frontend:Url"))
+        policy => policy.WithOrigins(frontendUrl)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());

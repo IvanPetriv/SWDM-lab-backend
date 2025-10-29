@@ -1,40 +1,46 @@
-﻿using Application.Objects.Auth;
-using Application.Objects.Configurations;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Application.Configurations;
+using Domain.Entities;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Services.Auth;
-public class JwtTokenService(JwtConfiguration jwtConfig) {
-    /// <summary>
-    /// Generates a JWT token for a specified user for a specified period of time.
-    /// </summary>
-    /// <param name="user">User claims to be included in the token.</param>
-    /// <param name="expiresInSeconds">Period of time for which the token will be valid.</param>
-    /// <returns>Generated JWT token.</returns>
-    /// <exception cref="ArgumentException">Thrown if the secret key is too short (<32 characters)</exception>
-    public string GetJwtToken(JwtUserClaims user, int expiresInSeconds) {
-        // Checks if configuration is correct
-        if (string.IsNullOrEmpty(jwtConfig.Key) || jwtConfig.Key.Length < 32) {
-            throw new ArgumentException("JWT key must be at least 32 characters long.");
-        }
 
-        // Prepares the data for the token
-        SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(jwtConfig.Key));
+public class JwtTokenService(JwtConfiguration jwtConfig)
+{
+    private static string GetUserRole(User user)
+    {
+        return user switch
+        {
+            Student => "Student",
+            Administrator => "Administrator",
+            Teacher => "Teacher",
+            _ => throw new ArgumentException("Unknown user type")
+        };
+    }
+
+    public string GetJwtToken(User user)
+    {
+        if (string.IsNullOrEmpty(jwtConfig.Secret) || jwtConfig.Secret.Length < 32)
+            throw new ArgumentException("JWT key must be at least 32 characters long.");
+
+        SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(jwtConfig.Secret));
         SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha256);
-        List<Claim> claims = [
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Sub, user.PublicId),
+        List<Claim> claims =
+        [
+            new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+            new(ClaimTypes.Role, GetUserRole(user)),
         ];
 
-        // Creates the token
-        JwtSecurityToken token = new(jwtConfig.Issuer,
-                                    jwtConfig.Audience,
-                                    claims,
-                                    expires: DateTime.Now.AddSeconds(expiresInSeconds),
-                                    signingCredentials: signingCredentials);
+        JwtSecurityToken token = new(
+            jwtConfig.Issuer,
+            jwtConfig.Audience,
+            claims,
+            expires: DateTime.Now.AddSeconds(jwtConfig.Expiry),
+            signingCredentials: signingCredentials
+        );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
