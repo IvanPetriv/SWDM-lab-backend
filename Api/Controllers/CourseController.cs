@@ -84,7 +84,7 @@ public class CourseController(
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Teacher,Administrator")]
-    public async Task<ActionResult> Update(Guid id, [FromBody] CourseGetDto objDto, CancellationToken ct)
+    public async Task<ActionResult> Update(Guid id, [FromBody] CourseUpdateDto objDto, CancellationToken ct)
     {
         Course obj = mapper.Map<Course>(objDto);
         var updated = await service.UpdateAsync(id, obj, ct);

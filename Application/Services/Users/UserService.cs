@@ -31,6 +31,28 @@ public class UserService(UniversityDbContext dbContext) : IUserService
         return admin;
     }
 
+
+    public async Task<IEnumerable<User>> SearchByUsernameAsync(string usernamePart, CancellationToken ct) {
+        var query = usernamePart.ToLower();
+
+        var students = await dbContext.Students
+            .Where(u => u.Username.ToLower().Contains(query))
+            .ToListAsync(ct);
+
+        var teachers = await dbContext.Teachers
+            .Where(u => u.Username.ToLower().Contains(query))
+            .ToListAsync(ct);
+
+        var admins = await dbContext.Administrators
+            .Where(u => u.Username.ToLower().Contains(query))
+            .ToListAsync(ct);
+
+        return students.Cast<User>()
+            .Concat(teachers)
+            .Concat(admins);
+    }
+
+
     public async Task<User?> GetAsync(Guid id, CancellationToken ct)
     {
         var student = await dbContext.Students.FirstOrDefaultAsync(u => u.Id == id, ct);

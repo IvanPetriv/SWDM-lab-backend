@@ -13,7 +13,7 @@ namespace Api.Controllers;
 [Route("[controller]")]
 [Authorize]
 public class UserController(
-    UserService service,
+    IUserService service,
     IMapper mapper
 ) : ControllerBase
 {
@@ -48,8 +48,10 @@ public class UserController(
 
     [HttpGet("search")]
     public async Task<ActionResult<IEnumerable<UserSearchDto>>> SearchUsers([FromQuery] string username, CancellationToken ct) {
-        var allUsers = await service.GetByUsernameAsync(username, ct);
+        if (string.IsNullOrWhiteSpace(username))
+            return BadRequest("Username query cannot be empty.");
 
+        var allUsers = await service.SearchByUsernameAsync(username, ct);
         var dtos = mapper.Map<IEnumerable<UserSearchDto>>(allUsers);
         return Ok(dtos);
     }

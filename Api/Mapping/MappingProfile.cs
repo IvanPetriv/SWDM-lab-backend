@@ -20,6 +20,7 @@ public class MappingProfile : Profile {
         CreateMap<Administrator, UserGetDto>();
         CreateMap<Enrollment, EnrollmentGetDto>().ReverseMap();
         CreateMap<Course, CourseGetDto>().ReverseMap();
+        CreateMap<Course, CourseUpdateDto>().ReverseMap();
 
     }
 }
