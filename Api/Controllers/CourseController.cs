@@ -84,13 +84,13 @@ public class CourseController(
 
     [HttpPost]
     [Authorize(Roles = "Teacher,Administrator")]
-    public async Task<ActionResult<CourseGetDto>> Create(CourseGetDto objDto, CancellationToken ct)
+    public async Task<ActionResult<CourseGetDto>> Create([FromBody] CreateCourseDto objDto, CancellationToken ct)
     {
         var obj = mapper.Map<Course>(objDto);
-        var createdStudent = await service.Create(obj, ct);
+        var createdCourse = await service.Create(obj, ct);
 
-        var resultDto = mapper.Map<CourseGetDto>(createdStudent);
-        return CreatedAtAction(nameof(Get), new { id = createdStudent.Id }, resultDto);
+        var resultDto = mapper.Map<CourseGetDto>(createdCourse);
+        return CreatedAtAction(nameof(Get), new { id = createdCourse.Id }, resultDto);
     }
 
     [HttpPut("{id}")]

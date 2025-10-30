@@ -108,6 +108,7 @@ public class CourseService(UniversityDbContext dbContext)
     /// <returns>Created <see cref="Course"/> object.</returns>
     public async Task<Course> Create(Course obj, CancellationToken ct)
     {
+        obj.Id = Guid.NewGuid();
         await dbContext.Courses.AddAsync(obj, ct);
         await dbContext.SaveChangesAsync(ct);
         return obj;
