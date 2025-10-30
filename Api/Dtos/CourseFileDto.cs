@@ -7,5 +7,6 @@ public class CourseFileDto
     public string FileName { get; set; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
+    public long Size { get; set; }
     public DateTime UploadedAt { get; set; }
 }

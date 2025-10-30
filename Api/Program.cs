@@ -46,6 +46,7 @@ builder.Services.AddDbContext<UniversityDbContext>(options =>
 );
 builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<MappingProfile>(); });
 
+builder.Services.AddScoped<FileService>();
 builder.Services.AddScoped<StudentService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TeacherService>();

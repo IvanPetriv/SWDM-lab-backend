@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCore;
-public partial class UniversityDbContext : DbContext {
+
+public partial class UniversityDbContext : DbContext
+{
     #region DbSets
     public DbSet<Course> Courses { get; set; } = null!;
     public DbSet<Enrollment> Enrollments { get; set; } = null!;
@@ -11,10 +13,12 @@ public partial class UniversityDbContext : DbContext {
     public DbSet<Administrator> Administrators { get; set; } = null!;
     public DbSet<TextMaterial> TextMaterials { get; set; } = null!;
     public DbSet<MediaMaterial> MediaMaterials { get; set; } = null!;
+    public DbSet<CourseFile> CourseFiles { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     #endregion
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
         modelBuilder.Entity<Enrollment>()
             .HasKey(e => new { e.StudentId, e.CourseId });
         modelBuilder.Entity<Enrollment>()

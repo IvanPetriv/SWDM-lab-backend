@@ -21,17 +21,34 @@ public class CourseService(UniversityDbContext dbContext)
     }
 
     /// <summary>
-    /// 
+    /// Gets a course by ID with all associated files (excluding file content for performance).
     /// </summary>
     /// <param name="id">Course ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns><see cref="Course"/> object with files if found, null otherwise.</returns>
     public async Task<Course?> GetByIdWithFiles(Guid id, CancellationToken ct)
     {
-        Course? course = await dbContext.Courses
-            .Include(c => c.TextMaterials)
-            .Include(c => c.MediaMaterials)
-            .FirstOrDefaultAsync(e => e.Id == id, ct);
+        var course = await dbContext.Courses
+            .Where(c => c.Id == id)
+            .Select(c => new Course
+            {
+                Id = c.Id,
+                TeacherId = c.TeacherId,
+                Name = c.Name,
+                Description = c.Description,
+                Code = c.Code,
+                CourseFiles = c.CourseFiles.Select(f => new CourseFile
+                {
+                    Id = f.Id,
+                    CourseId = f.CourseId,
+                    FileName = f.FileName,
+                    FileType = f.FileType,
+                    FileSize = f.FileSize,
+                    CreatedAt = f.CreatedAt
+                    // FileContent is intentionally excluded for performance
+                }).ToList()
+            })
+            .FirstOrDefaultAsync(ct);
 
         return course;
     }

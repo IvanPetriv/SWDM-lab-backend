@@ -3,6 +3,7 @@ using System;
 using EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EFCore.Migrations
 {
     [DbContext(typeof(UniversityDbContext))]
-    partial class UniversityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029233833_files")]
+    partial class files
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,9 +58,6 @@ namespace EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -77,8 +77,6 @@ namespace EFCore.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
 
                     b.ToTable("CourseFiles");
                 });
@@ -270,17 +268,6 @@ namespace EFCore.Migrations
                         .HasForeignKey("TeacherId");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CourseFile", b =>
-                {
-                    b.HasOne("Domain.Entities.Course", "Course")
-                        .WithMany("CourseFiles")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-                });
-
             modelBuilder.Entity("Domain.Entities.Enrollment", b =>
                 {
                     b.HasOne("Domain.Entities.Course", "Course")
@@ -335,8 +322,6 @@ namespace EFCore.Migrations
 
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
-                    b.Navigation("CourseFiles");
-
                     b.Navigation("Enrollments");
 
                     b.Navigation("MediaMaterials");

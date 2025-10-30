@@ -30,7 +30,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => "Administrator"));
         CreateMap<Enrollment, EnrollmentGetDto>().ReverseMap();
         CreateMap<Course, CourseGetDto>().ReverseMap();
-        CreateMap<Course, CourseWithFilesDto>();
+        CreateMap<Course, CourseWithFilesDto>()
+            .ForMember(dest => dest.Files, opt => opt.MapFrom(src => src.CourseFiles));
+        CreateMap<CourseFile, CourseFileDto>()
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.FileType))
+            .ForMember(dest => dest.UploadedAt, opt => opt.MapFrom(src => src.CreatedAt))
+            .ForMember(dest => dest.FilePath, opt => opt.MapFrom(src => src.FileName));
         CreateMap<MediaMaterial, CourseFileDto>()
             .ForMember(dest => dest.FilePath, opt => opt.MapFrom(src => src.FileName))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.FileType))

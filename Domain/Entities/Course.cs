@@ -1,5 +1,7 @@
 ﻿namespace Domain.Entities;
-public class Course {
+
+public class Course
+{
     public Guid Id { get; set; }
     public Guid? TeacherId { get; set; }
     public string Name { get; set; } = "";
@@ -10,4 +12,5 @@ public class Course {
     public virtual ICollection<Enrollment> Enrollments { get; set; } = [];
     public virtual ICollection<TextMaterial> TextMaterials { get; set; } = [];
     public virtual ICollection<MediaMaterial> MediaMaterials { get; set; } = [];
+    public virtual ICollection<CourseFile> CourseFiles { get; set; } = [];
 }
