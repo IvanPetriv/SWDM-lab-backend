@@ -6,18 +6,22 @@ namespace Application.Services;
 public class StudentService(UniversityDbContext dbContext) {
     public async Task<Student?> GetById(Guid id, CancellationToken ct) {
         Student? student = await dbContext.Students
-            .SingleOrDefaultAsync(e => e.Id == id, ct);
+			.AsNoTracking()
+			.SingleOrDefaultAsync(e => e.Id == id, ct);
 
         return student;
     }
 
     public async Task<ICollection<Student>> GetAll(CancellationToken ct) =>
-        await dbContext.Students.ToListAsync(ct);
+        await dbContext.Students
+            .AsNoTracking()
+		    .ToListAsync(ct);
 
 
     public async Task<ICollection<Student>> GetStudentsInCourse(Guid courseId, CancellationToken ct) =>
         await dbContext.Enrollments
-            .Where(e => e.CourseId == courseId)
+			.AsNoTracking()
+			.Where(e => e.CourseId == courseId)
             .Include(e => e.Student)
             .Select(e => e.Student)
             .ToListAsync(ct);

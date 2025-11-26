@@ -15,7 +15,8 @@ public class CourseService(UniversityDbContext dbContext)
     public async Task<Course?> GetById(Guid id, CancellationToken ct)
     {
         Course? course = await dbContext.Courses
-            .SingleOrDefaultAsync(e => e.Id == id, ct);
+			.AsNoTracking()
+			.SingleOrDefaultAsync(e => e.Id == id, ct);
 
         return course;
     }
@@ -29,7 +30,8 @@ public class CourseService(UniversityDbContext dbContext)
     public async Task<Course?> GetByIdWithFiles(Guid id, CancellationToken ct)
     {
         var course = await dbContext.Courses
-            .Where(c => c.Id == id)
+			.AsNoTracking()
+			.Where(c => c.Id == id)
             .Select(c => new Course
             {
                 Id = c.Id,
@@ -62,6 +64,7 @@ public class CourseService(UniversityDbContext dbContext)
     public async Task<ICollection<Course>> GetAll(CancellationToken ct)
     {
         List<Course> courses = await dbContext.Courses
+            .AsNoTracking()
             .ToListAsync(ct);
 
         return courses;
@@ -77,6 +80,7 @@ public class CourseService(UniversityDbContext dbContext)
     public async Task<ICollection<Course>> GetAllOfTeacher(Guid teacherId, CancellationToken ct)
     {
         List<Course> courses = await dbContext.Courses
+            .AsNoTracking()
             .Where(e => e.TeacherId == teacherId)
             .ToListAsync(ct);
 
@@ -92,7 +96,8 @@ public class CourseService(UniversityDbContext dbContext)
     public async Task<ICollection<Course>> GetAllOfStudent(Guid studentId, CancellationToken ct)
     {
         List<Course> courses = await dbContext.Enrollments
-            .Where(e => e.StudentId == studentId)
+			.AsNoTracking()
+			.Where(e => e.StudentId == studentId)
             .Select(e => e.Course)
             .ToListAsync(ct);
 
@@ -168,13 +173,18 @@ public class CourseService(UniversityDbContext dbContext)
     /// <returns></returns>
     public async Task<Enrollment?> EnrollStudent(Guid studentId, Guid courseId, CancellationToken ct)
     {
-        if (!await dbContext.Students.AnyAsync(s => s.Id == studentId, ct)
-            || !await dbContext.Courses.AnyAsync(c => c.Id == courseId, ct))
-        {
-            return null;
-        }
+		var studentExists = await dbContext.Students
+			.AsNoTracking()
+			.AnyAsync(s => s.Id == studentId, ct);
 
-        Enrollment enrollment = new()
+		var courseExists = await dbContext.Courses
+			.AsNoTracking()
+			.AnyAsync(c => c.Id == courseId, ct);
+
+		if (!studentExists || !courseExists)
+			return null;
+
+		Enrollment enrollment = new()
         {
             StudentId = studentId,
             CourseId = courseId,

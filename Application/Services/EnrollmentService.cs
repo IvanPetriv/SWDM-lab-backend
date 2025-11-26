@@ -46,6 +46,7 @@ public class EnrollmentService(UniversityDbContext dbContext)
     public async Task<IEnumerable<Student>> GetCourseStudents(Guid courseId, CancellationToken ct)
     {
         var students = await dbContext.Enrollments
+            .AsNoTracking()
             .Where(e => e.CourseId == courseId)
             .Include(e => e.Student)
             .Select(e => e.Student)
@@ -60,12 +61,15 @@ public class EnrollmentService(UniversityDbContext dbContext)
     public async Task<Course?> AddTeacherToCourse(Guid teacherId, Guid courseId, CancellationToken ct)
     {
         // Check if teacher exists
-        var teacherExists = await dbContext.Teachers.AnyAsync(t => t.Id == teacherId, ct);
+        var teacherExists = await dbContext.Teachers
+            .AsNoTracking()
+            .AnyAsync(t => t.Id == teacherId, ct);
         if (!teacherExists)
             return null;
 
         // Get the course
-        var course = await dbContext.Courses.FirstOrDefaultAsync(c => c.Id == courseId, ct);
+        var course = await dbContext.Courses
+            .FirstOrDefaultAsync(c => c.Id == courseId, ct);
         if (course == null)
             return null;
 

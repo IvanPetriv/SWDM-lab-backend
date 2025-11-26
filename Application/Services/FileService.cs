@@ -39,7 +39,8 @@ public class FileService(UniversityDbContext dbContext)
 
     public async Task<CourseFile?> GetFileAsync(Guid id, CancellationToken ct)
     {
-        return await dbContext.CourseFiles.FindAsync([id], ct);
+        return await dbContext.CourseFiles
+            .FindAsync([id], ct);
     }
 
     public async Task DeleteFileAsync(Guid id, CancellationToken ct)

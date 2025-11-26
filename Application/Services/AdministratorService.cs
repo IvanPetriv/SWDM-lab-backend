@@ -6,10 +6,14 @@ namespace Application.Services;
 
 public class AdministratorService(UniversityDbContext dbContext) {
     public async Task<Administrator?> GetById(Guid id, CancellationToken ct) =>
-        await dbContext.Administrators.SingleOrDefaultAsync(a => a.Id == id, ct);
+        await dbContext.Administrators
+            .AsNoTracking()
+            .SingleOrDefaultAsync(a => a.Id == id, ct);
 
     public async Task<ICollection<Administrator>> GetAll(CancellationToken ct) =>
-        await dbContext.Administrators.ToListAsync(ct);
+        await dbContext.Administrators
+			.AsNoTracking()
+		    .ToListAsync(ct);
 
     public async Task<Administrator> Create(Administrator obj, CancellationToken ct) {
         await dbContext.Administrators.AddAsync(obj, ct);
@@ -39,10 +43,14 @@ public class AdministratorService(UniversityDbContext dbContext) {
 
     // User management actions
     public async Task<ICollection<Student>> GetAllStudents(CancellationToken ct) =>
-        await dbContext.Students.ToListAsync(ct);
+        await dbContext.Students
+        .AsNoTracking()
+        .ToListAsync(ct);
 
     public async Task<ICollection<Teacher>> GetAllTeachers(CancellationToken ct) =>
-        await dbContext.Teachers.ToListAsync(ct);
+        await dbContext.Teachers
+        .AsNoTracking()
+        .ToListAsync(ct);
 
     public async Task<bool> DeleteStudent(Guid id, CancellationToken ct) {
         Student? student = await dbContext.Students.FindAsync([id], ct);
