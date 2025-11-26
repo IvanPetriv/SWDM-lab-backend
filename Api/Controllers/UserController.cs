@@ -4,6 +4,7 @@ using Application.Services;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -99,38 +100,25 @@ public class UserController(
     {
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
-        User user = userDto.Role.ToLowerInvariant() switch
-        {
-            "administrator" or "admin" => new Administrator
-            {
-                Username = userDto.Username,
-                FirstName = userDto.FirstName,
-                LastName = userDto.LastName,
-                Email = userDto.Email,
-                PasswordHash = hashedPassword
-            },
-            "teacher" => new Teacher
-            {
-                Username = userDto.Username,
-                FirstName = userDto.FirstName,
-                LastName = userDto.LastName,
-                Email = userDto.Email,
-                PasswordHash = hashedPassword
-            },
-            _ => new Student
-            {
-                Username = userDto.Username,
-                FirstName = userDto.FirstName,
-                LastName = userDto.LastName,
-                Email = userDto.Email,
-                PasswordHash = hashedPassword
-            }
-        };
+		User user = userDto.Role.ToLowerInvariant() switch {
+			"administrator" or "admin" => new Administrator(),
+			"teacher" => new Teacher(),
+			_ => new Student()
+		};
 
-        var createdUser = await service.Create(user, ct);
+		user.Username = userDto.Username;
+		user.FirstName = userDto.FirstName;
+		user.LastName = userDto.LastName;
+		user.Email = userDto.Email;
+		user.PasswordHash = hashedPassword;
+
+		var createdUser = await service.Create(user, ct);
         var resultDto = mapper.Map<UserGetDto>(createdUser);
-        return CreatedAtAction(nameof(GetCurrentUser), resultDto);
-    }
+		return CreatedAtAction(nameof(GetUserById),
+			new { id = createdUser.Id },
+			resultDto
+		);
+	}
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrator")]

@@ -13,20 +13,47 @@ public class FileController(
     FileService service
 ) : ControllerBase
 {
+	private static async Task<byte[]> ReadFileBytesAsync(IFormFile file, CancellationToken ct) {
+		byte[] buffer = new byte[file.Length];
+		using var stream = file.OpenReadStream();
+		int totalRead = 0;
 
-    [HttpPost("upload")]
+		while (totalRead < buffer.Length) {
+			int read = await stream.ReadAsync(buffer.AsMemory(totalRead), ct);
+			if (read == 0)
+				break;
+			totalRead += read;
+		}
+
+		return buffer;
+	}
+
+	private static string NormalizeExtension(string? ext) {
+		if (string.IsNullOrWhiteSpace(ext))
+			return string.Empty;
+
+		return ext.Trim().TrimStart('.').ToLowerInvariant();
+	}
+
+	[HttpPost("upload")]
     [Authorize(Roles = "Teacher,Administrator")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<CourseFileDto>> UploadFile([FromForm] IFormFile file, [FromForm] Guid courseId, CancellationToken ct)
     {
-        byte[] content;
-        using (var ms = new MemoryStream())
-        {
-            await file.CopyToAsync(ms, ct);
-            content = ms.ToArray();
-        }
+		if (file is null || file.Length == 0)
+			return BadRequest("File is empty.");
+
+		var content = await ReadFileBytesAsync(file, ct);
+		string ext = NormalizeExtension(Path.GetExtension(file.FileName));
+
         var uploadedFile = await service.UploadFileAsync(
-            content, file.FileName, Path.GetExtension(file.FileName)?.TrimStart('.') ?? "", file.Length, courseId, ct);
+            content,
+            file.FileName,
+            ext,
+            file.Length,
+            courseId,
+            ct
+        );
 
 
         var dto = new CourseFileDto
@@ -49,7 +76,17 @@ public class FileController(
             return NotFound();
         }
 
-        return File(file.FileContent, "application/octet-stream", file.FileName);
+		string ext = NormalizeExtension(Path.GetExtension(file.FileName));
+		string contentType = ext switch {
+			"pdf" => "application/pdf",
+			"txt" => "text/plain",
+			"jpg" or "jpeg" => "image/jpeg",
+			"png" => "image/png",
+			// fallback
+			_ => "application/octet-stream",
+		};
+
+		return File(file.FileContent, contentType, file.FileName);
     }
 
     [HttpDelete("{id}")]
