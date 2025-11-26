@@ -29,20 +29,11 @@ public class CourseController(
 
         var userRole = this.GetCurrentUserRole();
 
-        ICollection<Course> courses;
-
-        if (userRole == "Teacher")
-        {
-            courses = await service.GetAllOfTeacher(userId.Value, ct);
-        }
-        else if (userRole == "Student")
-        {
-            courses = await service.GetAllOfStudent(userId.Value, ct);
-        }
-        else
-        {
-            courses = await service.GetAll(ct);
-        }
+        ICollection<Course> courses = userRole switch {
+            "Teacher" => await service.GetAllOfTeacher(userId.Value, ct),
+            "Student" => await service.GetAllOfStudent(userId.Value, ct),
+            _ => await service.GetAll(ct),
+        };
 
         var result = mapper.Map<IEnumerable<CourseGetDto>>(courses);
         return Ok(result);

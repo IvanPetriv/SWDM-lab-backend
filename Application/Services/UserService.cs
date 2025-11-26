@@ -8,29 +8,13 @@ public class UserService(UniversityDbContext dbContext)
 {
     public async Task<User?> GetById(Guid id, CancellationToken ct)
     {
-        var student = await dbContext.Students.FirstOrDefaultAsync(u => u.Id == id, ct);
-        if (student != null) return student;
-
-        var teacher = await dbContext.Teachers.FirstOrDefaultAsync(u => u.Id == id, ct);
-        if (teacher != null) return teacher;
-
-        var admin = await dbContext.Administrators.FirstOrDefaultAsync(u => u.Id == id, ct);
-        return admin;
-    }
+		return await dbContext.Set<User>().FirstOrDefaultAsync(u => u.Id == id, ct);
+	}
 
     public async Task<IEnumerable<User>> GetAll(CancellationToken ct)
     {
-        var students = await dbContext.Students.ToListAsync(ct);
-        var teachers = await dbContext.Teachers.ToListAsync(ct);
-        var admins = await dbContext.Administrators.ToListAsync(ct);
-
-        var users = new List<User>();
-        users.AddRange(students);
-        users.AddRange(teachers);
-        users.AddRange(admins);
-
-        return users;
-    }
+		return await dbContext.Set<User>().ToListAsync(ct);
+	}
 
     public async Task<User> Create(User user, CancellationToken ct)
     {
@@ -70,25 +54,8 @@ public class UserService(UniversityDbContext dbContext)
 
     public async Task<IEnumerable<User>> SearchByUsername(string username, CancellationToken ct)
     {
-        var students = await dbContext.Students
-            .Where(u => u.Username.Contains(username))
-            .ToListAsync(ct);
-
-        var teachers = await dbContext.Teachers
-            .Where(u => u.Username.Contains(username))
-            .ToListAsync(ct);
-
-        var admins = await dbContext.Administrators
-            .Where(u => u.Username.Contains(username))
-            .ToListAsync(ct);
-
-        var users = new List<User>();
-        users.AddRange(students);
-        users.AddRange(teachers);
-        users.AddRange(admins);
-
-        return users;
-    }
+		return dbContext.Set<User>().Where(u => u.Username.Contains(username));
+	}
 
     public async Task<IEnumerable<Student>> SearchStudentsByUsername(string username, CancellationToken ct)
     {
@@ -100,7 +67,7 @@ public class UserService(UniversityDbContext dbContext)
     public async Task<bool> Delete(Guid id, CancellationToken ct)
     {
         var user = await GetById(id, ct);
-        if (user == null)
+        if (user is null)
             return false;
 
         dbContext.Remove(user);

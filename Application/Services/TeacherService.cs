@@ -28,6 +28,7 @@ public class TeacherService(UniversityDbContext dbContext) {
             return null;
 
         dbContext.Entry(existing).CurrentValues.SetValues(updated);
+        existing.Id = id;
         await dbContext.SaveChangesAsync(ct);
         return existing;
     }

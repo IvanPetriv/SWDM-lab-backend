@@ -46,7 +46,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CourseFile", b =>
@@ -80,7 +80,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CourseFiles");
+                    b.ToTable("CourseFiles", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Enrollment", b =>
@@ -101,7 +101,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Enrollments");
+                    b.ToTable("Enrollments", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MediaMaterial", b =>
@@ -143,7 +143,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("MediaMaterials");
+                    b.ToTable("MediaMaterials", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
@@ -175,7 +175,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.TextMaterial", b =>
@@ -199,7 +199,7 @@ namespace EFCore.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("TextMaterials");
+                    b.ToTable("TextMaterials", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -235,7 +235,7 @@ namespace EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
 
                     b.HasDiscriminator().HasValue("User");
 
