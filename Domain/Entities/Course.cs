@@ -13,4 +13,6 @@ public class Course
     public virtual ICollection<TextMaterial> TextMaterials { get; set; } = [];
     public virtual ICollection<MediaMaterial> MediaMaterials { get; set; } = [];
     public virtual ICollection<CourseFile> CourseFiles { get; set; } = [];
+    public virtual ICollection<Post> Posts { get; set; } = [];
+    public virtual ICollection<Test> Tests { get; set; } = [];
 }

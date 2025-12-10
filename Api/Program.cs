@@ -53,6 +53,8 @@ builder.Services.AddScoped<TeacherService>();
 builder.Services.AddScoped<AdministratorService>();
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<EnrollmentService>();
+builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<TestService>();
 
 
 builder.Services.AddControllers();

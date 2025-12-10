@@ -41,6 +41,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.FilePath, opt => opt.MapFrom(src => src.FileName))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.FileType))
             .ForMember(dest => dest.UploadedAt, opt => opt.MapFrom(src => src.CreatedAt));
+        CreateMap<Post, PostGetDto>()
+            .ForMember(dest => dest.HasImage, opt => opt.MapFrom(src => src.ImageData != null));
 
     }
 }

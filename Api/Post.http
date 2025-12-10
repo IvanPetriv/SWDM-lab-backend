@@ -1,0 +1,94 @@
+### Post API Testing Examples
+### This file contains sample HTTP requests for testing the Post endpoints
+
+@baseUrl = https://localhost:5001
+@token = your_jwt_token_here
+
+### 1. Get all posts for a course (as teacher or enrolled student)
+GET {{baseUrl}}/Post/course/3fa85f64-5717-4562-b3fc-2c963f66afa6
+Authorization: Bearer {{token}}
+
+### 2. Get a specific post by ID
+GET {{baseUrl}}/Post/3fa85f64-5717-4562-b3fc-2c963f66afa6
+Authorization: Bearer {{token}}
+
+### 3. Get post image
+GET {{baseUrl}}/Post/3fa85f64-5717-4562-b3fc-2c963f66afa6/image
+Authorization: Bearer {{token}}
+
+### 4. Create a new post without image (Teacher only)
+POST {{baseUrl}}/Post
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="courseId"
+
+3fa85f64-5717-4562-b3fc-2c963f66afa6
+--boundary
+Content-Disposition: form-data; name="textContent"
+
+Welcome to the new semester! Please check the course materials section for the syllabus.
+--boundary--
+
+### 5. Create a post with image (Teacher only)
+POST {{baseUrl}}/Post
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="courseId"
+
+3fa85f64-5717-4562-b3fc-2c963f66afa6
+--boundary
+Content-Disposition: form-data; name="textContent"
+
+Important announcement with attached diagram.
+--boundary
+Content-Disposition: form-data; name="image"; filename="diagram.jpg"
+Content-Type: image/jpeg
+
+< ./path/to/image.jpg
+--boundary--
+
+### 6. Update post - change text only (Author only)
+PUT {{baseUrl}}/Post/3fa85f64-5717-4562-b3fc-2c963f66afa6
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="textContent"
+
+Updated announcement: The deadline has been extended to next Friday.
+--boundary--
+
+### 7. Update post - add/replace image (Author only)
+PUT {{baseUrl}}/Post/3fa85f64-5717-4562-b3fc-2c963f66afa6
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="image"; filename="new-diagram.jpg"
+Content-Type: image/jpeg
+
+< ./path/to/new-image.jpg
+--boundary--
+
+### 8. Update post - remove image (Author only)
+PUT {{baseUrl}}/Post/3fa85f64-5717-4562-b3fc-2c963f66afa6
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="removeImage"
+
+true
+--boundary--
+
+### 9. Delete a post (Author only)
+DELETE {{baseUrl}}/Post/3fa85f64-5717-4562-b3fc-2c963f66afa6
+Authorization: Bearer {{token}}
+
+### 10. Get all posts created by current teacher
+GET {{baseUrl}}/Post/my-posts
+Authorization: Bearer {{token}}

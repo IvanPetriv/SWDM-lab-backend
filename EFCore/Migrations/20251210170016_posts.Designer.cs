@@ -3,6 +3,7 @@ using System;
 using EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EFCore.Migrations
 {
     [DbContext(typeof(UniversityDbContext))]
-    partial class UniversityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251210170016_posts")]
+    partial class posts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,10 +174,6 @@ namespace EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -183,55 +182,6 @@ namespace EFCore.Migrations
                     b.HasIndex("CourseId");
 
                     b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Question", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("QuestionText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("TestId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TestId");
-
-                    b.ToTable("Questions");
-                });
-
-            modelBuilder.Entity("Domain.Entities.QuestionOption", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsCorrect")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("OptionText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("QuestionId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("QuestionOptions");
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
@@ -264,89 +214,6 @@ namespace EFCore.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshTokens");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SubmissionAnswer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("QuestionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SelectedOptionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SubmissionId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("SelectedOptionId");
-
-                    b.HasIndex("SubmissionId");
-
-                    b.ToTable("SubmissionAnswers");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Test", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("Tests");
-                });
-
-            modelBuilder.Entity("Domain.Entities.TestSubmission", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<double>("Grade")
-                        .HasColumnType("double precision");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("TestId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentId");
-
-                    b.HasIndex("TestId");
-
-                    b.ToTable("TestSubmissions");
                 });
 
             modelBuilder.Entity("Domain.Entities.TextMaterial", b =>
@@ -493,28 +360,6 @@ namespace EFCore.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Question", b =>
-                {
-                    b.HasOne("Domain.Entities.Test", "Test")
-                        .WithMany("Questions")
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Test");
-                });
-
-            modelBuilder.Entity("Domain.Entities.QuestionOption", b =>
-                {
-                    b.HasOne("Domain.Entities.Question", "Question")
-                        .WithMany("Options")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
-                });
-
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("Domain.Entities.User", "User")
@@ -524,63 +369,6 @@ namespace EFCore.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.SubmissionAnswer", b =>
-                {
-                    b.HasOne("Domain.Entities.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.QuestionOption", "SelectedOption")
-                        .WithMany()
-                        .HasForeignKey("SelectedOptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.TestSubmission", "Submission")
-                        .WithMany("Answers")
-                        .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
-
-                    b.Navigation("SelectedOption");
-
-                    b.Navigation("Submission");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Test", b =>
-                {
-                    b.HasOne("Domain.Entities.Course", "Course")
-                        .WithMany("Tests")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("Domain.Entities.TestSubmission", b =>
-                {
-                    b.HasOne("Domain.Entities.Student", "Student")
-                        .WithMany("TestSubmissions")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Test", "Test")
-                        .WithMany("Submissions")
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-
-                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("Domain.Entities.TextMaterial", b =>
@@ -604,26 +392,7 @@ namespace EFCore.Migrations
 
                     b.Navigation("Posts");
 
-                    b.Navigation("Tests");
-
                     b.Navigation("TextMaterials");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Question", b =>
-                {
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Test", b =>
-                {
-                    b.Navigation("Questions");
-
-                    b.Navigation("Submissions");
-                });
-
-            modelBuilder.Entity("Domain.Entities.TestSubmission", b =>
-                {
-                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -634,8 +403,6 @@ namespace EFCore.Migrations
             modelBuilder.Entity("Domain.Entities.Student", b =>
                 {
                     b.Navigation("Enrollments");
-
-                    b.Navigation("TestSubmissions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Teacher", b =>

@@ -15,6 +15,12 @@ public partial class UniversityDbContext : DbContext
     public DbSet<MediaMaterial> MediaMaterials { get; set; } = null!;
     public DbSet<CourseFile> CourseFiles { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+    public DbSet<Post> Posts { get; set; } = null!;
+    public DbSet<Test> Tests { get; set; } = null!;
+    public DbSet<Question> Questions { get; set; } = null!;
+    public DbSet<QuestionOption> QuestionOptions { get; set; } = null!;
+    public DbSet<TestSubmission> TestSubmissions { get; set; } = null!;
+    public DbSet<SubmissionAnswer> SubmissionAnswers { get; set; } = null!;
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
